@@ -260,11 +260,11 @@ SetNetEnv(char *dev_name_list, char *port_stat_list)
 		char socket_mem_str[32] = "";
 		// int i;
 		int ret, socket_mem;
-#if RTE_VERSION < RTE_VERSION_NUM(19, 8, 0, 0)
+// #if RTE_VERSION < RTE_VERSION_NUM(19, 8, 0, 0)
 		static struct ether_addr ports_eth_addr[RTE_MAX_ETHPORTS];
-#else
-		static struct rte_ether_addr ports_eth_addr[RTE_MAX_ETHPORTS]; 
-#endif
+// #else
+// 		static struct rte_ether_addr ports_eth_addr[RTE_MAX_ETHPORTS]; 
+// #endif
 
 		/* STEP 1: first determine CPU mask */
 		mpz_init(_cpumask);
@@ -303,7 +303,7 @@ SetNetEnv(char *dev_name_list, char *port_stat_list)
 				       RTE_CACHE_LINE_SIZE);
 		
 		/* initialize the rte env, what a waste of implementation effort! */
-		int argc = 6;//8;
+		int argc = 8;//8;
 		char *argv[RTE_ARGC_MAX] = {"",
 					    "-c",
 					    cpumaskbuf,
@@ -313,7 +313,9 @@ SetNetEnv(char *dev_name_list, char *port_stat_list)
 					    "--socket-mem",
 					    socket_mem_str,
 #endif
-					    "--proc-type=auto"
+					    "--proc-type=auto",
+					    "-w",
+					    "37:00.0"
 		};
 		ret = probe_all_rte_devices(argv, &argc, dev_name_list);
 
@@ -342,7 +344,7 @@ SetNetEnv(char *dev_name_list, char *port_stat_list)
 #ifdef DEBUG
 		/* print argv's */
 		for (i = 0; i < argc; i++)
-			TRACE_INFO("argv[%d]: %s\n", i, argv[i]);
+			printf("dpdk argv[%d]: %s\n", i, argv[i]);
 #endif
 		/* initialize the dpdk eal env */
 		ret = rte_eal_init(argc, argv);
@@ -351,11 +353,11 @@ SetNetEnv(char *dev_name_list, char *port_stat_list)
 			exit(EXIT_FAILURE);
 		}
 		/* give me the count of 'detected' ethernet ports */
-#if RTE_VERSION < RTE_VERSION_NUM(18, 5, 0, 0)
-		num_devices = rte_eth_dev_count();
-#else
+// #if RTE_VERSION < RTE_VERSION_NUM(18, 5, 0, 0)
+// 		num_devices = rte_eth_dev_count();
+// #else
 		num_devices = rte_eth_dev_count_avail();
-#endif
+// #endif
 		if (num_devices == 0) {
 			TRACE_ERROR("No Ethernet port!\n");
 			exit(EXIT_FAILURE);
