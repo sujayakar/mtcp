@@ -83,6 +83,11 @@ MTCP IN ONVM MODE.
 
 ========================================================================
 
+echo:
+    sudo apps/example/echo -f apps/example/epserver.conf -n 100000 -c && sudo chown $USER timing.log
+    sudo apps/example/echo -f apps/example/epserver.conf -n 1 -s
+    
+
                    Contact: mtcp-user at list.ndsl.kaist.edu
                              April 2, 2014. 
                  EunYoung Jeong <notav at ndsl.kaist.edu>
