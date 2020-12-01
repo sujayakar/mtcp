@@ -80,7 +80,16 @@ LIBS += -L$(LIBCCP) -lccp -lstartccp
 INC += -I$(LIBCCP)
 endif
 
-all: epserver epwget
+all: epserver epwget echo
+
+echo.o: echo.c
+        $(MSG) "   CC $<"
+        $(HIDE) ${CC} -c $< ${CFLAGS} ${INC}
+
+echo: echo.o ${MTCP_FLD}/lib/libmtcp.a
+        $(MSG) "   LD $<"
+        $(HIDE) ${CC} $< ${LIBS} ${UTIL_OBJ} -o $@
+
 
 epserver.o: epserver.c
 	$(MSG) "   CC $<"
