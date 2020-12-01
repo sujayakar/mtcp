@@ -153,10 +153,8 @@ int main(int argc, char** argv) {
 		int fd = -1;
 		printf("Accepting...\n");
 		while (fd == -1) {
-			// printf("fak waiting for connect\n");
 			int nevents = mtcp_epoll_wait(mctx, ep, events, MAX_EVENTS, -1);
 			if (nevents < 0) {
-				// printf("epoll_wait failed: %d\n", errno);
 				return 1;
 			}
 			int do_accept = 0;
@@ -169,10 +167,8 @@ int main(int argc, char** argv) {
 				ret = mtcp_accept(mctx, listener, NULL, NULL);
 				if (ret < 0) {
 					if (errno == EAGAIN) {
-						// printf("fak EAGAIN\n");
 						continue;
 					}
-					// printf("mtcp_accept failed: %d\n", errno);
 					return 1;
 				}
 				struct mtcp_epoll_event ev;
@@ -187,16 +183,13 @@ int main(int argc, char** argv) {
 
 		char buf[64];
 		for (int i = 0; ; i++) {
-			// printf("Round %d\n", i);
 			int num_read = 0;
 			int wait = 0;
 			while (num_read < 64) {
 				int do_read = 1;
 				if (wait) {
-					// printf("fak waiting for in\n");
 					int nevents = mtcp_epoll_wait(mctx, ep, events, MAX_EVENTS, -1);
 			    		if (nevents < 0) {
-			    			// printf("epoll_wait failed: %d\n", errno);
 			    			return 1;
 			    		}
 			    		do_read = 0;
@@ -210,15 +203,12 @@ int main(int argc, char** argv) {
 					int bytes_read = mtcp_read(mctx, fd, &buf[num_read], 64 - num_read);
 					if (bytes_read < 0) {
 						if (errno == EAGAIN || errno == ENOTCONN) {
-							// printf("fak EAGAIN: %d\n", errno);
 							wait = 1;
 							continue;
 						}
-						// printf("mtcp_read failed: %d\n", errno);
 						return 1;
 					}
 					num_read += bytes_read;
-					// printf("read %d bytes\n", bytes_read);
 				}
 			}
 			int num_written = 0;
@@ -226,10 +216,8 @@ int main(int argc, char** argv) {
 			while (num_written < 64) {
 				int do_write = 1;
 				if (wait) {
-					// printf("fak waiting for write\n");
 					int nevents = mtcp_epoll_wait(mctx, ep, events, MAX_EVENTS, -1);
 					if (nevents < 0) {
-						// printf("epoll_wait failed: %d\n", errno);
 						return 1;
 					}
 					do_write = 0;
@@ -243,65 +231,15 @@ int main(int argc, char** argv) {
 					int bytes_written = mtcp_write(mctx, fd, &buf[num_written], 64 - num_written);
 					if (bytes_written < 0) {
 						if (errno == EAGAIN) {
-							// printf("fak EAGAIN\n");
 							wait = 1;
 							continue;
 						}
-						// printf("mtcp_write failed: %d\n", errno);
 						return 1;
 					}
 					num_written += bytes_written;
-					// printf("wrote %d bytes\n", bytes_written);
 				}
 			}
 		}
-
-		// int fd = -1;
-		// while (fd == -1) {
-		// 	int fd = mtcp_accept(mctx, listener, NULL, NULL);
-		// 	if (fd < 0) {
-		// 		if (errno == EAGAIN) {
-		// 			continue;
-		// 		}
-		// 		printf("Failed to accept from socket\n");
-		// 		return 1;
-		// 	}
-		// }
-		// printf("Accepted connection\n");
-
-		// ret = mtcp_setsock_nonblock(mctx, listener);
-		// if (ret < 0) {
-		// 	printf("Failed to set nonblocking socket\n");
-		// 	return 1;
-		// }
-
-		// char buf[64];
-		// for (int i = 0; i < num_iters; i++) {
-		// 	int num_read = 0;
-		// 	while (num_read < 64) {
-		// 		int bytes_read = mtcp_read(mctx, fd, &buf[num_read], 64 - num_read);
-		// 		if (bytes_read < 0) {
-		// 			if (errno == EAGAIN) {
-		// 				continue;
-		// 			}
-		// 			printf("Failed to read from socket: %d\n", errno);
-		// 			return 1;
-		// 		}
-		// 		num_read += bytes_read;
-		// 	}
-		// 	int num_written = 0;
-		// 	while (num_written < 64) {
-		// 		int bytes_written = mtcp_write(mctx, fd, &buf[num_written], 64 - num_written);
-		// 		if (bytes_written < 0) {
-		// 			if (errno == EAGAIN) {
-		// 				continue;
-		// 			}
-		// 			printf("Failed to write to socket: %d\n", errno);
-		// 			return 1;
-		// 		}
-		// 		num_written += bytes_written;
-		// 	}
-		// }
 
 		if (mtcp_close(mctx, fd) < 0) {
 			printf("Failed to close socket\n");
@@ -352,17 +290,14 @@ int main(int argc, char** argv) {
 		int timing_ptr = 0;
 
 		for (int i = 0; i < num_iters; i++) {
-			// printf("Round %d\n", i);
 			struct timespec start = timer_start();	
                         int num_written = 0;
                         int wait = 0;
                         while (num_written < 64) {
                                 int do_write = 1;
                                 if (wait) {
-                                        // printf("fak waiting for write\n");
                                         int nevents = mtcp_epoll_wait(mctx, ep, events, MAX_EVENTS, -1);
                                         if (nevents < 0) {
-                                                // printf("epoll_wait failed: %d\n", errno);
                                                 return 1;
                                         }
                                         do_write = 0;
@@ -376,14 +311,11 @@ int main(int argc, char** argv) {
                                         int bytes_written = mtcp_write(mctx, socket, &buf[num_written], 64 - num_written);
                                         if (bytes_written < 0) {
                                                 if (errno == EAGAIN || errno == ENOTCONN) {
-                                                        // printf("fak EAGAIN: %d\n", errno);
                                                         wait = 1;
                                                         continue;
                                                 }
-                                                // printf("mtcp_write failed: %d\n", errno);
                                                 return 1;
                                         }
-					// printf("wrote %d bytes\n", bytes_written);
                                         num_written += bytes_written;
                                 }
                         }
@@ -392,10 +324,8 @@ int main(int argc, char** argv) {
                         while (num_read < 64) {
                                 int do_read = 1;
                                 if (wait) {
-                                        // printf("fak waiting for in\n");
                                         int nevents = mtcp_epoll_wait(mctx, ep, events, MAX_EVENTS, -1);
                                         if (nevents < 0) {
-                                                // printf("epoll_wait failed: %d\n", errno);
                                                 return 1;
                                         }
                                         do_read = 0;
@@ -409,15 +339,12 @@ int main(int argc, char** argv) {
                                         int bytes_read = mtcp_read(mctx, socket, &buf[num_read], 64 - num_read);
                                         if (bytes_read < 0) {
                                                 if (errno == EAGAIN) {
-                                                        // printf("fak EAGAIN\n");
                                                         wait = 1;
                                                         continue;
                                                 }
-                                                // printf("mtcp_read failed: %d\n", errno);
                                                 return 1;
                                         }
                                         num_read += bytes_read;
-					// printf("read %d bytes\n", bytes_read);
                                 }
                         }                                
 			for (int j = 0; j < 64; j++) {
@@ -441,43 +368,6 @@ int main(int argc, char** argv) {
 			dprintf(timing_fd, "%ld\n", timing_buf[i]);	
 		}
 		close(timing_fd);
-		// char buf[64];
-		// for (int i = 0; i < 64; i++) {
-		// 	buf[i] = 'a';
-		// }
-		// for (int i = 0; i < num_iters; i++) {
-		// 	int num_written = 0;
-		// 	while (num_written < 64) {
-		// 		int bytes_written = mtcp_write(mctx, socket, &buf[num_written], 64 - num_written);
-		// 		if (bytes_written < 0) {
-		// 			if (errno == EAGAIN) {
-		// 				continue;
-		// 			}
-		// 			printf("Failed to write to socket: %d\n", errno);
-		// 			return 1;
-		// 		}
-		// 		num_written += bytes_written;
-		// 	}
-		// 	int num_read = 0;
-		// 	while (num_read < 64) {
-		// 		int bytes_read = mtcp_read(mctx, socket, &buf[num_read], 64 - num_read);
-		// 		if (bytes_read < 0) {
-		// 			if (errno == EAGAIN) {
-		// 				continue;
-		// 			}
-		// 			printf("Failed to read from socket: %d\n", errno);
-		// 			return 1;
-		// 		}
-		// 		num_read += bytes_read;
-		// 	}
-		// 	for (int i = 0; i < 64; i++) {
-		// 		if (buf[i] != 'a') {
-		// 			printf("Echoed buffer didn't have fill character: %d\n", buf[i]);
-		// 			return 1;
-		// 		}
-		// 	}
-		// }
-
 	}
 
 	return 0;
